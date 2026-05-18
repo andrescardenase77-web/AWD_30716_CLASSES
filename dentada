@@ -1,0 +1,117 @@
+services:
+  postgres_prod:
+    image: postgres:16
+    container_name: postgres_prod
+    restart: always
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin
+      POSTGRES_DB: gestion
+    ports:
+      - "5435:5432"
+    networks:
+      - env_prod
+    volumes:
+      - /home/admin/sysdb/ejercicio4/disco/prod:/var/lib/postgresql/data
+    deploy:
+      resources:
+        limits:
+          cpus: '0.30'
+          memory: 500M
+        reservations:
+          cpus: '0.15'
+          memory: 250M
+
+  postgres_pre:
+    image: postgres:16
+    container_name: postgres_pre
+    restart: always
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin
+      POSTGRES_DB: gestion
+    ports:
+      - "5436:5432"
+    networks:
+      - env_pre
+    volumes:
+      - /home/admin/sysdb/ejercicio4/disco/pre:/var/lib/postgresql/data
+    deploy:
+      resources:
+        limits:
+          cpus: '0.30'
+          memory: 500M
+        reservations:
+          cpus: '0.15'
+          memory: 250M
+
+  postgres_dev:
+    image: postgres:16
+    container_name: postgres_dev
+    restart: always
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin
+      POSTGRES_DB: gestion
+    ports:
+      - "5437:5432"
+    networks:
+      - env_dev
+    volumes:
+      - /home/admin/sysdb/ejercicio4/disco/dev:/var/lib/postgresql/data
+    deploy:
+      resources:
+        limits:
+          cpus: '0.30'
+          memory: 500M
+        reservations:
+          cpus: '0.15'
+          memory: 250M
+
+  adminerdb:
+    image: adminer:latest
+    container_name: adminerdb
+    restart: always
+    ports:
+      - "8085:8080"
+    depends_on:
+      - postgres_prod
+      - postgres_pre
+      - postgres_dev
+    networks:
+      - env_prod
+      - env_pre
+      - env_dev
+    deploy:
+      resources:
+        limits:
+          cpus: "0.15"
+          memory: 250M
+        reservations:
+          cpus: "0.1"
+          memory: 128M
+networks:
+    env_prod:
+      driver: bridge
+      ipam: 
+        driver: default
+        config:
+          - 
+            subnet: 172.16.232.0/24
+            gateway: 172.16.232.1
+    env_pre:
+      driver: bridge
+      ipam: 
+        driver: default
+        config:
+          - 
+            subnet: 172.16.233.0/24
+            gateway: 172.16.233.1
+    env_dev:
+      driver: bridge
+      ipam: 
+        driver: default
+        config:
+          - 
+            subnet: 172.16.234.0/24
+            gateway: 172.16.234.1
